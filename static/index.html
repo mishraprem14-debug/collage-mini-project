@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JARVIS 2.0 — AI-Based Voice Assistant HUD</title>
+    <!-- Google Fonts for futuristic sci-fi aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="theme-cyan">
+    <!-- Background Grid and Particle Overlay -->
+    <div class="hud-grid-background"></div>
+    <div class="scanline-overlay"></div>
+
+    <div class="hud-container">
+        <!-- TOP HUD HEADER -->
+        <header class="hud-header">
+            <div class="header-left">
+                <div class="reactor-icon">
+                    <span class="core-dot"></span>
+                </div>
+                <div class="brand-title">
+                    <h1>JARVIS <span>2.0 ULTRA</span></h1>
+                    <p class="subtitle">AI-BASED NEURAL VOICE ASSISTANT</p>
+                </div>
+            </div>
+
+            <div class="header-center">
+                <div class="status-pill" id="globalStatusPill">
+                    <span class="pulse-indicator" id="statusIndicator"></span>
+                    <span class="status-label" id="statusLabel">SYSTEM STANDBY</span>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="hud-clock">
+                    <div class="time-display" id="hudClock">12:00:00 PM</div>
+                    <div class="date-display" id="hudDate">MONDAY, OCT 11</div>
+                </div>
+
+                <!-- Theme Selector & Audio SFX -->
+                <div class="hud-controls">
+                    <select id="themeSelect" class="hud-dropdown" title="Select Theme">
+                        <option value="theme-cyan">ARC CYAN</option>
+                        <option value="theme-crimson">MARK 85 RED</option>
+                        <option value="theme-matrix">MATRIX EMERALD</option>
+                        <option value="theme-cyber">NEON PURPLE</option>
+                        <option value="theme-gold">SOLAR GOLD</option>
+                    </select>
+                    <button id="sfxToggleBtn" class="hud-btn-icon" title="Toggle Futuristic SFX">🔊</button>
+                    <button id="fullscreenBtn" class="hud-btn-icon" title="Toggle Fullscreen">⛶</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN COCKPIT VIEW -->
+        <main class="hud-main">
+            <!-- LEFT PANEL: SYSTEM TELEMETRY -->
+            <aside class="hud-panel telemetry-panel">
+                <div class="panel-header">
+                    <span class="panel-tag">[SYS.DIAGNOSTICS]</span>
+                    <h2>HARDWARE TELEMETRY</h2>
+                </div>
+
+                <div class="telemetry-grid">
+                    <!-- CPU Meter -->
+                    <div class="telemetry-card">
+                        <div class="meter-info">
+                            <span class="meter-title">CPU UTILIZATION</span>
+                            <span class="meter-val" id="cpuValue">0%</span>
+                        </div>
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-bar-fill" id="cpuBar" style="width: 0%;"></div>
+                        </div>
+                        <span class="meter-sub" id="cpuCores">Logical Cores: --</span>
+                    </div>
+
+                    <!-- RAM Meter -->
+                    <div class="telemetry-card">
+                        <div class="meter-info">
+                            <span class="meter-title">MEMORY (RAM)</span>
+                            <span class="meter-val" id="ramValue">0%</span>
+                        </div>
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-bar-fill" id="ramBar" style="width: 0%;"></div>
+                        </div>
+                        <span class="meter-sub" id="ramDetail">0 GB / 0 GB</span>
+                    </div>
+
+                    <!-- Battery Meter -->
+                    <div class="telemetry-card">
+                        <div class="meter-info">
+                            <span class="meter-title">POWER / BATTERY</span>
+                            <span class="meter-val" id="batteryValue">100%</span>
+                        </div>
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-bar-fill" id="batteryBar" style="width: 100%;"></div>
+                        </div>
+                        <span class="meter-sub" id="batteryState">Status: AC Online</span>
+                    </div>
+
+                    <!-- Audio Volume Slider -->
+                    <div class="telemetry-card">
+                        <div class="meter-info">
+                            <span class="meter-title">AUDIO GAIN</span>
+                            <span class="meter-val" id="volumeValue">50%</span>
+                        </div>
+                        <input type="range" id="volumeSlider" min="0" max="100" value="50" class="hud-slider">
+                        <div class="slider-actions">
+                            <button id="muteBtn" class="mini-btn">MUTE / UNMUTE</button>
+                        </div>
+                    </div>
+
+                    <!-- System Info -->
+                    <div class="telemetry-card sys-info-card">
+                        <div class="info-row">
+                            <span class="info-key">SYSTEM UPTIME:</span>
+                            <span class="info-val" id="uptimeValue">0h 0m</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-key">PLATFORM:</span>
+                            <span class="info-val" id="osValue">Windows NT</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-key">NEURAL CORE:</span>
+                            <span class="info-val highlight">NLP ACTIVE</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- CENTER COCKPIT: ARC REACTOR & VOICE INTERACTION -->
+            <section class="hud-center-core">
+                <!-- ARC REACTOR CANVAS -->
+                <div class="arc-reactor-wrapper">
+                    <canvas id="visualizerCanvas" width="460" height="460"></canvas>
+                    <div class="reactor-center-button" id="micCoreButton" title="Click to Speak to JARVIS">
+                        <div class="inner-glow"></div>
+                        <div class="mic-glyph">🎙️</div>
+                        <span class="core-command-tag">VOICE INTERFACE</span>
+                    </div>
+                </div>
+
+                <!-- SPEECH RECOGNITION LIVE FEEDBACK -->
+                <div class="speech-transcript-box" id="transcriptBox">
+                    <div class="transcript-header">
+                        <span class="dot"></span>
+                        <span id="transcriptState">VOICE RECOGNITION READY</span>
+                    </div>
+                    <p id="liveTranscriptText">Click the Arc Reactor or microphone button to speak, or type your query below.</p>
+                </div>
+
+                <!-- COMMAND PROMPT INPUT BAR -->
+                <div class="hud-input-bar">
+                    <div class="input-icon">⚡</div>
+                    <input type="text" id="commandInput" placeholder="Give an order to JARVIS... (e.g. 'Play music', 'Open Notepad', 'System status')" autocomplete="off">
+                    <button id="sendBtn" class="hud-send-btn">
+                        <span>EXECUTE</span>
+                    </button>
+                    <button id="backendListenBtn" class="hud-mic-btn" title="Listen via Backend Mic">
+                        <span>🎤 PC MIC</span>
+                    </button>
+                </div>
+
+                <!-- QUICK QUERY SUGGESTION CHIPS -->
+                <div class="query-chips">
+                    <button class="chip" data-query="Open YouTube">📺 YouTube</button>
+                    <button class="chip" data-query="Open LinkedIn">💼 LinkedIn</button>
+                    <button class="chip" data-query="Open Instagram">📸 Instagram</button>
+                    <button class="chip" data-query="Open WhatsApp">💬 WhatsApp</button>
+                    <button class="chip" data-query="Open ChatGPT">🤖 ChatGPT</button>
+                    <button class="chip" data-query="What time is it?">⏰ Time & Date</button>
+                    <button class="chip" data-query="System status">📊 System Diag</button>
+                    <button class="chip" data-query="Take a screenshot">📸 Screenshot</button>
+                    <button class="chip" data-query="Tell me a joke">😂 Tell Joke</button>
+                    <button class="chip" data-query="What is the weather today?">🌦️ Weather</button>
+                </div>
+            </section>
+
+            <!-- RIGHT PANEL: ACTION CENTER & APP LAUNCHER -->
+            <aside class="hud-panel action-panel">
+                <div class="panel-header">
+                    <span class="panel-tag">[ACTION.HUB]</span>
+                    <h2>DIRECT COMMAND DOCK</h2>
+                </div>
+
+                <div class="action-dock-scroll">
+                    <!-- SECTION: SYSTEM APPLICATIONS -->
+                    <div class="dock-section">
+                        <h3 class="dock-title">WINDOWS APPLICATIONS</h3>
+                        <div class="dock-grid">
+                            <button class="dock-btn" data-cmd="open notepad">
+                                <span class="btn-icon">📝</span>
+                                <span class="btn-name">Notepad</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="open calculator">
+                                <span class="btn-icon">🧮</span>
+                                <span class="btn-name">Calculator</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="open chrome">
+                                <span class="btn-icon">🌐</span>
+                                <span class="btn-name">Chrome</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="open vs code">
+                                <span class="btn-icon">💻</span>
+                                <span class="btn-name">VS Code</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="open file explorer">
+                                <span class="btn-icon">📁</span>
+                                <span class="btn-name">Explorer</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="open command prompt">
+                                <span class="btn-icon">⌨️</span>
+                                <span class="btn-name">Terminal</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="open task manager">
+                                <span class="btn-icon">📈</span>
+                                <span class="btn-name">Task Mgr</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="open paint">
+                                <span class="btn-icon">🎨</span>
+                                <span class="btn-name">Paint</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SECTION: SYSTEM CONTROLS -->
+                    <div class="dock-section">
+                        <h3 class="dock-title">SYSTEM AUTOMATION</h3>
+                        <div class="dock-grid">
+                            <button class="dock-btn special" data-cmd="take a screenshot">
+                                <span class="btn-icon">📸</span>
+                                <span class="btn-name">Screenshot</span>
+                            </button>
+                            <button class="dock-btn special" data-cmd="lock screen">
+                                <span class="btn-icon">🔒</span>
+                                <span class="btn-name">Lock PC</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="mute">
+                                <span class="btn-icon">🔇</span>
+                                <span class="btn-name">Mute / Audio</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="system status">
+                                <span class="btn-icon">⚡</span>
+                                <span class="btn-name">Diag Health</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SECTION: SOCIAL & WEB PLATFORMS -->
+                    <div class="dock-section">
+                        <h3 class="dock-title">SOCIAL & WEB PLATFORMS</h3>
+                        <div class="dock-grid">
+                            <button class="dock-btn" data-cmd="open linkedin">
+                                <span class="btn-icon">💼</span>
+                                <span class="btn-name">LinkedIn</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="open instagram">
+                                <span class="btn-icon">📸</span>
+                                <span class="btn-name">Instagram</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="open twitter">
+                                <span class="btn-icon">🐦</span>
+                                <span class="btn-name">Twitter (X)</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="open facebook">
+                                <span class="btn-icon">📘</span>
+                                <span class="btn-name">Facebook</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="open whatsapp">
+                                <span class="btn-icon">💬</span>
+                                <span class="btn-name">WhatsApp</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="open chatgpt">
+                                <span class="btn-icon">🤖</span>
+                                <span class="btn-name">ChatGPT</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="open youtube">
+                                <span class="btn-icon">▶️</span>
+                                <span class="btn-name">YouTube</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="open spotify">
+                                <span class="btn-icon">🎵</span>
+                                <span class="btn-name">Spotify</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="open google">
+                                <span class="btn-icon">🔍</span>
+                                <span class="btn-name">Google</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="open amazon">
+                                <span class="btn-icon">🛒</span>
+                                <span class="btn-name">Amazon</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SECTION: AI BRAIN & UTILITIES -->
+                    <div class="dock-section">
+                        <h3 class="dock-title">AI & UTILITIES</h3>
+                        <div class="dock-grid">
+                            <button class="dock-btn" data-cmd="tell me a joke">
+                                <span class="btn-icon">🎭</span>
+                                <span class="btn-name">Joke</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="motivate me">
+                                <span class="btn-icon">✨</span>
+                                <span class="btn-name">Quote</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="flip a coin">
+                                <span class="btn-icon">🪙</span>
+                                <span class="btn-name">Coin Flip</span>
+                            </button>
+                            <button class="dock-btn" data-cmd="what is today">
+                                <span class="btn-icon">📅</span>
+                                <span class="btn-name">Date Info</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- BOTTOM HUD: INTERACTIVE NEURAL ACTIVITY LOG & CONVERSATION STREAM -->
+        <footer class="hud-log-section">
+            <div class="log-section-header">
+                <div class="log-title">
+                    <span class="pulse-ring"></span>
+                    <h3>NEURAL ACTIVITY & COMMAND FEED</h3>
+                </div>
+                <div class="log-actions">
+                    <button id="clearLogBtn" class="mini-btn">CLEAR LOG</button>
+                    <button id="exportLogBtn" class="mini-btn">EXPORT HISTORY</button>
+                </div>
+            </div>
+
+            <div class="log-container" id="logContainer">
+                <!-- Initial Welcome Card -->
+                <div class="log-entry jarvis">
+                    <div class="log-badge">JARVIS CORE</div>
+                    <div class="log-content">
+                        <p>Welcome back, sir. All neural command modules, speech synthesis, and telemetry systems are fully operational. Ready for voice or text directives.</p>
+                        <span class="log-time" id="initLogTime">INIT_OK</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- SCREENSHOT MODAL PREVIEW -->
+    <div class="modal-overlay" id="screenshotModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>📸 SCREENSHOT CAPTURED</h3>
+                <button class="modal-close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <img id="modalScreenshotImg" src="" alt="Screenshot Preview">
+            </div>
+            <div class="modal-footer">
+                <a id="modalDownloadBtn" href="" download class="hud-send-btn">DOWNLOAD IMAGE</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/visualizer.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
